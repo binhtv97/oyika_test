@@ -1,0 +1,2 @@
+const fonts = {};
+export {fonts};

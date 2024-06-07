@@ -1,0 +1,36 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": ["ES6"],
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@components": ["./src/components/index.ts"],
+      "@constants/*": ["./src/constants/*"],
+      "@constants": ["./src/constants/index.ts"],
+      "@hook/*": ["./src/hook/*"],
+      "@hook": ["./src/hook/index.ts"],
+      "@locale/*": ["./src/locale/*"],
+      "@navigation/*": ["./src/navigation/*"],
+      "@services/*": ["./src/services/*"],
+      "@services": ["./src/services/index.ts"],
+      "@store/*": ["./src/store/*"],
+      "@themes/*": ["./src/themes/*"],
+      "@themes": ["./src/themes/index.ts"],
+      "@types/*": ["./src/types/*"],
+      "@utilities/*": ["./src/utilities/*"],
+      "@screens/*": ["./src/screens/*"],
+      "@screens": ["./src/screens/index.ts"],
+      "@assets/*": ["./src/assets/*"],
+      "@common": ["./src/common/index.ts"],
+      "@common/*": ["./src/common/*"],
+      "@networking": ["./src/networking/index.ts"],
+      "@networking/*": ["./src/networking/*"]
+    }
+  }
+}
