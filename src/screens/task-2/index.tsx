@@ -1,28 +1,14 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import React, {useCallback, useState} from 'react';
-import Container from '@components/Container';
-import {
-  NoteItem,
-  createTable,
-  getDBConnection,
-  getNoteItems,
-  saveNoteItems,
-  deleteNoteItem,
-} from '@services/db';
-import {Row} from '@components/Row';
-import {colors} from '@themes/colors';
-import {CustomImage} from '@components/Images';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
-import {navigate} from '@navigation/RootNavigation';
-import RouteKey from '@navigation/RouteKey';
-import {useFocusEffect} from '@react-navigation/native';
+import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, {useCallback, useState} from "react";
+import Container from "@components/Container";
+import {NoteItem, createTable, getDBConnection, getNoteItems, saveNoteItems, deleteNoteItem} from "@services/db";
+import {Row} from "@components/Row";
+import {colors} from "@themes/colors";
+import {CustomImage} from "@components/Images";
+import {SQLiteDatabase} from "react-native-sqlite-storage";
+import {navigate} from "@navigation/RootNavigation";
+import RouteKey from "@navigation/RouteKey";
+import {useFocusEffect} from "@react-navigation/native";
 
 const TaskTwo = () => {
   const [data, setData] = useState<NoteItem[]>([]);
@@ -33,47 +19,41 @@ const TaskTwo = () => {
   const loadDataCallback = useCallback(async () => {
     try {
       const initTodos: NoteItem[] = [
-        {id: 0, title: 'go to shop', note: 'Buy Milk'},
+        {id: 0, title: "go to shop", note: "Buy Milk"},
         {
           id: 1,
-          title: 'eat at least a one healthy foods',
-          note: 'Eat Chicken at dinner',
+          title: "eat at least a one healthy foods",
+          note: "Eat Chicken at dinner",
         },
-        {id: 2, title: 'Do some exercises', note: 'Do Math'},
+        {id: 2, title: "Do some exercises", note: "Do Math"},
       ];
       const db = await getDBConnection();
       setDatabase(db);
       await createTable(db);
       const storedNoteItems = await getNoteItems(db);
-
       if (storedNoteItems.length) {
         setData(storedNoteItems);
-        setRenderData(prevData => [
-          ...prevData,
-          ...storedNoteItems.slice(prevData.length, prevData.length + 50),
-        ]);
+        setRenderData(storedNoteItems.slice(0, 10));
       } else {
         await saveNoteItems(db, initTodos);
-        setData(initTodos);
+        setRenderData(initTodos);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
   // get data when goback
   useFocusEffect(
     React.useCallback(() => {
       loadDataCallback();
-    }, [loadDataCallback]),
+    }, [loadDataCallback])
   );
 
   const loadMoreItems = () => {
-    if (isLoadmore) return;
-
+    if (isLoadmore || renderData.length < 10) return;
     setIsLoadMore(true);
     setTimeout(() => {
-      setRenderData(prevData => [
-        ...prevData,
-        ...data.slice(prevData.length, prevData.length + 50),
-      ]);
+      setRenderData((prevData) => [...prevData, ...data.slice(prevData.length, prevData.length + 50)]);
       setIsLoadMore(false);
     }, 1500);
   };
@@ -81,8 +61,11 @@ const TaskTwo = () => {
   const onDeleteItem = (id: number) => {
     if (database) {
       deleteNoteItem(database, id);
-      setRenderData(prevData => {
-        return prevData.filter(item => item.id !== id);
+      setRenderData((prevData) => {
+        const result = prevData.filter((item) => item.id !== id);
+        console.log(result);
+
+        return result;
       });
     }
   };
@@ -97,10 +80,11 @@ const TaskTwo = () => {
           <TouchableOpacity
             onPress={() =>
               navigate(RouteKey.CreateNoteScreen, {
-                type: 'edit',
+                type: "edit",
                 item: item,
               })
-            }>
+            }
+          >
             <CustomImage name="edit" style={{tintColor: colors.greenDark}} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => onDeleteItem(item.id)}>
@@ -113,7 +97,7 @@ const TaskTwo = () => {
 
   const renderFooter = () => {
     if (!isLoadmore || renderData.length < 10) return null;
-    return <ActivityIndicator color={'#000'} />;
+    return <ActivityIndicator color={"#000"} />;
   };
   return (
     <Container
@@ -121,13 +105,14 @@ const TaskTwo = () => {
       style={styles.container}
       iconRight={[
         {
-          icon: 'add',
+          icon: "add",
           onPress: () =>
             navigate(RouteKey.CreateNoteScreen, {
-              type: 'add',
+              type: "add",
             }),
         },
-      ]}>
+      ]}
+    >
       <FlatList
         data={renderData}
         renderItem={renderItem}
@@ -155,10 +140,10 @@ const styles = StyleSheet.create({
   },
   itemLeft: {
     flex: 2,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   itemRight: {
     flex: 1,
   },
-  rightRow: {justifyContent: 'center', alignItems: 'center', flex: 1},
+  rightRow: {justifyContent: "center", alignItems: "center", flex: 1},
 });

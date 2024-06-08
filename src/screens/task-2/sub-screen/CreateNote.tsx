@@ -1,62 +1,54 @@
-import {StyleSheet} from 'react-native';
-import React from 'react';
-import Container from '@components/Container';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AppStackParamList} from '@navigation/Types';
-import RouteKey from '@navigation/RouteKey';
-import * as yup from 'yup';
-import {useYupValidationResolver} from '@hook/useYupValidationResolver';
-import {FormProvider, useForm} from 'react-hook-form';
-import {FormInput} from '@components/FormInput';
-import {Space} from '@components/Space';
-import {CustomButton} from '@components/Button';
-import {colors} from '@themes/colors';
-import {FontSizes} from '@themes/metrics';
-import {
-  NoteItem,
-  getDBConnection,
-  getNoteItems,
-  saveNoteItems,
-} from '@services/db';
-import {showToast} from '@components/Toast';
-import NetInfo from '@react-native-community/netinfo';
-import {useDispatch} from 'react-redux';
-import {noteActions} from '@store/reducers';
+import {StyleSheet} from "react-native";
+import React from "react";
+import Container from "@components/Container";
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {AppStackParamList} from "@navigation/Types";
+import RouteKey from "@navigation/RouteKey";
+import * as yup from "yup";
+import {useYupValidationResolver} from "@hook/useYupValidationResolver";
+import {FormProvider, useForm} from "react-hook-form";
+import {FormInput} from "@components/FormInput";
+import {Space} from "@components/Space";
+import {CustomButton} from "@components/Button";
+import {colors} from "@themes/colors";
+import {FontSizes} from "@themes/metrics";
+import {NoteItem, getDBConnection, getNoteItems, saveNoteItems} from "@services/db";
+import {showToast} from "@components/Toast";
+import NetInfo from "@react-native-community/netinfo";
+import {useDispatch} from "react-redux";
+import {noteActions} from "@store/reducers";
 
-type Props = NativeStackScreenProps<
-  AppStackParamList,
-  RouteKey.CreateNoteScreen
->;
+type Props = NativeStackScreenProps<AppStackParamList, RouteKey.CreateNoteScreen>;
 const FormSchema = yup.object().shape({
-  title: yup.string().required('Please enter input!'),
-  note: yup.string().required('Please enter input!'),
+  title: yup.string().required("Please enter input!"),
+  note: yup.string().required("Please enter input!"),
 });
 type FormPayload = yup.InferType<typeof FormSchema>;
 
-const CreateNote: React.FC<Props> = props => {
+const CreateNote: React.FC<Props> = (props) => {
   const type = props.route.params.type;
   const item = props.route.params?.item;
   const dispatch = useDispatch();
   const formMethods = useForm<FormPayload>({
     resolver: useYupValidationResolver<FormPayload>(FormSchema),
     defaultValues: {
-      title: type === 'add' ? '' : item?.title,
-      note: type === 'add' ? '' : item?.note,
+      title: type === "add" ? "" : item?.title,
+      note: type === "add" ? "" : item?.note,
     },
   });
   const {handleSubmit} = formMethods;
   // this func to check network is connect or not
   const checkNetworkAndDeviceInfo = async (): Promise<boolean> => {
     return await NetInfo.fetch()
-      .then(state => {
+      .then((state) => {
         if (state.isConnected) {
           return true;
         } else {
           return false;
         }
       })
-      .catch(error => {
-        console.error('Error checking network status:', error);
+      .catch((error) => {
+        console.error("Error checking network status:", error);
         return false;
       });
   };
@@ -66,12 +58,19 @@ const CreateNote: React.FC<Props> = props => {
     const storedNoteItems = await getNoteItems(db);
     const result: NoteItem[] = [
       {
-        id: type === 'add' ? storedNoteItems.length : (item?.id as number),
+        id: type === "add" ? storedNoteItems.length : (item?.id as number),
         title: data.title,
         note: data.note,
       },
     ];
-    await saveNoteItems(db, result);
+    try {
+      console.log(result);
+      
+      await saveNoteItems(db, result);
+
+    } catch (error) {
+      console.log(error);
+    }
     const network = await checkNetworkAndDeviceInfo();
 
     if (network) {
@@ -82,8 +81,8 @@ const CreateNote: React.FC<Props> = props => {
     }
 
     showToast({
-      message: type === 'add' ? 'Create Success' : 'Edit Success',
-      type: 'SUCCESS',
+      message: type === "add" ? "Create Success" : "Edit Success",
+      type: "SUCCESS",
     });
 
     () => {
@@ -91,18 +90,16 @@ const CreateNote: React.FC<Props> = props => {
     };
   };
   return (
-    <Container
-      titileHeader={type === 'add' ? 'CREATE' : 'EDIT'}
-      style={styles.container}>
+    <Container titileHeader={type === "add" ? "CREATE" : "EDIT"} style={styles.container}>
       <FormProvider {...formMethods}>
-        <FormInput name={'title'} title="Title" />
+        <FormInput name={"title"} title="Title" />
         <Space height={10} />
-        <FormInput name={'note'} title="Note" description />
+        <FormInput name={"note"} title="Note" description />
         <Space height={10} />
         <CustomButton
           label={[
             {
-              text: type === 'add' ? 'Submit' : 'Save',
+              text: type === "add" ? "Submit" : "Save",
               style: styles.label,
             },
           ]}
@@ -124,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.greenDark,
   },
   label: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.white,
     fontSize: FontSizes.large,
   },

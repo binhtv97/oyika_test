@@ -1,16 +1,10 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {appActions} from '@store/reducers';
-import {getTaskOneData} from '@store/selectors/app';
-import {ITaskOneItem} from '@store/types';
-import Container from '@components/Container';
+import {ActivityIndicator, FlatList, StyleSheet, Text, View} from "react-native";
+import React, {useCallback, useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {appActions} from "@store/reducers";
+import {getTaskOneData} from "@store/selectors/app";
+import {ITaskOneItem} from "@store/types";
+import Container from "@components/Container";
 
 const TaskOne = () => {
   const data = useSelector(getTaskOneData);
@@ -30,14 +24,11 @@ const TaskOne = () => {
   }, [data]);
 
   const loadMoreItems = () => {
-    if (isLoadmore) return;
+    if (isLoadmore || renderData.length < 10) return;
 
     setIsLoadMore(true);
     setTimeout(() => {
-      setRenderData(prevData => [
-        ...prevData,
-        ...data.slice(prevData.length, prevData.length + 50),
-      ]);
+      setRenderData((prevData) => [...prevData, ...data.slice(prevData.length, prevData.length + 50)]);
       setIsLoadMore(false);
     }, 1500);
   };
@@ -51,17 +42,14 @@ const TaskOne = () => {
 
   const renderFooter = () => {
     if (!isLoadmore) return null;
-    return <ActivityIndicator color={'#000'} />;
+    return <ActivityIndicator color={"#000"} />;
   };
 
-  const keyExtractor = useCallback(
-    (item: ITaskOneItem) => item.id.toString(),
-    [],
-  );
+  const keyExtractor = useCallback((item: ITaskOneItem) => item.id.toString(), []);
 
   return (
     <Container titileHeader="TASK ONE">
-      {isFetching && <ActivityIndicator color={'#000'} />}
+      {isFetching && <ActivityIndicator color={"#000"} />}
       {!isFetching && (
         <FlatList
           data={renderData}
@@ -84,6 +72,6 @@ const styles = StyleSheet.create({
   item: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
 });

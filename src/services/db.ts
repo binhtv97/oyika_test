@@ -14,12 +14,13 @@ const tableName = 'todoData';
 enablePromise(true);
 
 export const getDBConnection = async () => {
-  return openDatabase({name: 'todo-data.db', location: 'default'});
+  return openDatabase({name: 'note-data.db', location: 'default'});
 };
 
 export const createTable = async (db: SQLiteDatabase) => {
   // create table if not exists
   const query = `CREATE TABLE IF NOT EXISTS ${tableName}(
+       id INTEGER PRIMARY KEY NOT NULL,
         title TEXT NOT NULL,
         note TEXT NOT NULL
     );`;
@@ -31,7 +32,7 @@ export const getNoteItems = async (db: SQLiteDatabase): Promise<NoteItem[]> => {
   try {
     const noteItems: NoteItem[] = [];
     const results = await db.executeSql(
-      `SELECT rowid as id,title,note FROM ${tableName}`,
+      `SELECT id as id,title,note FROM ${tableName}`,
     );
     results.forEach(result => {
       for (let index = 0; index < result.rows.length; index++) {
@@ -49,14 +50,14 @@ export const saveNoteItems = async (
   noteItems: NoteItem[],
 ) => {
   const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}(rowid, title, note) values` +
+    `INSERT OR REPLACE INTO ${tableName}(id, title, note) values` +
     noteItems.map(i => `(${i.id}, '${i.title}', '${i.note}')`).join(',');
 
   return db.executeSql(insertQuery);
 };
 
 export const deleteNoteItem = async (db: SQLiteDatabase, id: number) => {
-  const deleteQuery = `DELETE from ${tableName} where rowid = ${id}`;
+  const deleteQuery = `DELETE from ${tableName} where id = ${id}`;
   await db.executeSql(deleteQuery);
 };
 
